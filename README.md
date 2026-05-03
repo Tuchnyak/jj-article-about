@@ -169,4 +169,39 @@ tuchnyak@tuchnyak-rosetuf:~/wdir/sync/Documents/Articles/20260503-jj$ jj log -r 
 ◆  zzzzzzzz root() 00000000
 
 ###
+jj new master feature/article-1
+#
+> jj log -r ::@
+@  prpkpqru george.sh.tech+github@gmail.com 2026-05-04 00:59:33 b3c35e56
+│  (empty) (no description set)
+○    yvpmquor george.sh.tech+github@gmail.com 2026-05-04 00:59:33 ff76e88d
+├─╮  (empty) merge feature/article-1 into master
+│ ○  sulwyqtw george.sh.tech+github@gmail.com 2026-05-04 00:55:26 feature/article-1 ae067bdd
+│ │  add commands example
+│ ○  ytxlyqkz george.sh.tech+github@gmail.com 2026-05-04 00:43:53 4c278817
+├─╯  first block about Philosophy of jj
+◆  stwtwrzm george.sh.tech+github@gmail.com 2026-05-03 21:18:40 master 18cfa9a9
+│  Hello world commit
+◆  suxwzwsx george.sh.tech+github@gmail.com 2026-05-03 21:17:04 9b7c31e5
+│  init commit - made using git command
+◆  zzzzzzzz root() 00000000
+#
+> jj b set master -r @-
+Moved 1 bookmarks to yvpmquor ff76e88d master* | (empty) merge feature/article-1 into master
+#
+> jj log -r ::@
+@  prpkpqru george.sh.tech+github@gmail.com 2026-05-04 00:59:33 b3c35e56
+│  (empty) (no description set)
+◆    yvpmquor george.sh.tech+github@gmail.com 2026-05-04 00:59:33 master ff76e88d
+├─╮  (empty) merge feature/article-1 into master
+│ ◆  sulwyqtw george.sh.tech+github@gmail.com 2026-05-04 00:55:26 feature/article-1 ae067bdd
+│ │  add commands example
+│ ◆  ytxlyqkz george.sh.tech+github@gmail.com 2026-05-04 00:43:53 4c278817
+├─╯  first block about Philosophy of jj
+◆  stwtwrzm george.sh.tech+github@gmail.com 2026-05-03 21:18:40 18cfa9a9
+│  Hello world commit
+◆  suxwzwsx george.sh.tech+github@gmail.com 2026-05-03 21:17:04 9b7c31e5
+│  init commit - made using git command
+◆  zzzzzzzz root() 00000000
+
 ```
