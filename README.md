@@ -121,6 +121,8 @@ jj b create feature/article-1 -r ytxlyqkz
 jj git push --bookmark feature/article-1
 ```
 
+---
+
 ## BLOCK-2: Закатываем рукава
 
 Как я упоминал выше, написание этого текста я фиксирую с JJ. Не очень просто, я вам скажу, текст писать так, чтобы ещё и рабочие кейсы иллюстрировать. Надеюсь, кукушка справится.
@@ -185,9 +187,9 @@ jj
 # нам покажут несколько 
 Hint: Use `jj -h` for a list of available commands.
 Run `jj config set --user ui.default-command log` to disable this message.
-@  ytxlyqkz george.sh.tech+github@gmail.com 2026-05-03 21:34:15 bc1a822b
+@  ytxlyqkz mail@gmail.com 2026-05-03 21:34:15 bc1a822b
 │  (empty) (no description set)
-◆  stwtwrzm george.sh.tech+github@gmail.com 2026-05-03 21:18:40 master 18cfa9a9
+◆  stwtwrzm mail@gmail.com 2026-05-03 21:18:40 master 18cfa9a9
 │  Hello world commit
 ~
 ```
@@ -216,13 +218,123 @@ jj log -r ::@
 
 - @-- - коммит дед/бабушка
 
-- @++ - внучатый коммит.
+- @++ - внучатый коммит
+
+- @-::@ - от родителя до текущего
 
 #### Пояс потуже
 
-Что было дальше? Дальше я наполнил первый блок статьи в несколько коммитов.
+Что было дальше? Дальше я наполнил первый блок статьи в несколько коммитов. В итоге у меня получилось опережение истории относительно **метки** master.
 
+```shell
+@  bla-bla-bla-meta-info                                       # <------ вот текущий "чистый лист"
+│  (empty) (no description set)
+○  sulwyqtw mail@gmail.com 2026-05-04 00:55:26 ae067bdd                # <------ вот последний коммит
+│  add commands example
+○  ytxlyqkz mail@gmail.com 2026-05-04 00:43:53 4c278817
+│  first block about Philosophy of jj
+◆  stwtwrzm mail@gmail.com 2026-05-03 21:18:40 master 18cfa9a9 # <------ вот мастер
+│  Hello world commit
+◆  suxwzwsx mail@gmail.com 2026-05-03 21:17:04 9b7c31e5
+│  init commit - made using git command
+◆  zzzzzzzz root() 00000000
+```
 
+Тут на практике начинает чувствоваться философия jj. Мы видим, что новая цепочка никак не именована, но, при этом, хорошо себя чувствует.
+В Гите такое невозможно. И мы либо продолжали бы делать коммиты в мастер или же сразу создали новую ветку.
+
+В jj у нас есть следующие возможности:
+
+1. Передвинуть указатель master на последний коммит нового отростка и запушить всё в ремоут в составе мастер ветки.
+
+2. Создать новую метку, например `feature/article-1` и запушить отросток как фиче-ветку под этим именем. А в Гитхабе создать PR на мастер.
+
+3. Путь одиночки и любителя `--no-ff` - сделать мерж последнего коммита отростка с последним коммитом мастера. При этом, чисто технически, метку можно и не ставить, но её наличие иллюстрирует смысл изменений, которые были в ответвлении.
+
+#### Merge
+
+Итак, путь №3 - ручное слияние.
+
+```shell
+# создаём метку на родителя - последний не пустой коммит
+jj b create feature/article-1 -r @-
+
+# лог нам покажет примерно такой вывод
+@  bla-bla-bla-meta-info                                       # <------ вот текущий "чистый лист"
+│  (empty) (no description set)
+○  sulwyqtw mail@gmail.com 2026-05-04 00:55:26  feature/article-1 ae067bdd # <------ поставили метку
+│  add commands example
+○  ytxlyqkz mail@gmail.com 2026-05-04 00:43:53 4c278817
+│  first block about Philosophy of jj
+◆  stwtwrzm mail@gmail.com 2026-05-03 21:18:40 master 18cfa9a9 # <------ вот мастер
+│  Hello world commit
+◆  suxwzwsx mail@gmail.com 2026-05-03 21:17:04 9b7c31e5
+│  init commit - made using git command
+◆  zzzzzzzz root() 00000000
+```
+
+Таким образом мы подготовили удобные именования, по которым проведём слияние.
+
+Однако, **важно** - команды merge в jj нет! Мерж в местной философии - это **новое изменение с двумя родителями**. Вполне традиционно. При этом, тот коммит, который будет указан родителем №1 (тонкий лёд пошёл...), будет считаться основным для относительных перемещений с помощью "@+" или "@-".
+
+```shell
+# вот так вот выглядит мерж с родителем 1 и родителем 2. (^_^)
+jj new master feature/article-1
+# вместо имён меток можно указывать change-id
+
+# так выглядит лог по команде "jj log -r ::@"
+@  prpkpqru mail@gmail.com 2026-05-04 00:59:33 b3c35e56
+│  (empty) (no description set)
+○    yvpmquor mail@gmail.com 2026-05-04 00:59:33 ff76e88d    # <------ вот слияние
+├─╮  (empty) merge feature/article-1 into master
+│ ○  sulwyqtw mail@gmail.com 2026-05-04 00:55:26 feature/article-1 ae067bdd # <------ вот фиче метка
+│ │  add commands example
+│ ○  ytxlyqkz mail@gmail.com 2026-05-04 00:43:53 4c278817
+├─╯  first block about Philosophy of jj
+◆  stwtwrzm mail@gmail.com 2026-05-03 21:18:40 master 18cfa9a9 # <------ вот мастер
+│  Hello world commit
+◆  suxwzwsx mail@gmail.com 2026-05-03 21:17:04 9b7c31e5
+│  init commit - made using git command
+◆  zzzzzzzz root() 00000000
+
+# Переставляем метку мастера на точку слияния родителей...
+> jj b set master -r @-
+Moved 1 bookmarks to yvpmquor ff76e88d master* | (empty) merge feature/article-1 into master
+#
+@  prpkpqru george.sh.tech+github@gmail.com 2026-05-04 00:59:33 b3c35e56
+│  (empty) (no description set)
+◆    yvpmquor george.sh.tech+github@gmail.com 2026-05-04 00:59:33 master ff76e88d # <------ мастер теперрь тут
+├─╮  (empty) merge feature/article-1 into master
+│ ◆  sulwyqtw george.sh.tech+github@gmail.com 2026-05-04 00:55:26 feature/article-1 ae067bdd # <------ вот фиче метка
+│ │  add commands example
+│ ◆  ytxlyqkz george.sh.tech+github@gmail.com 2026-05-04 00:43:53 4c278817
+├─╯  first block about Philosophy of jj
+◆  stwtwrzm george.sh.tech+github@gmail.com 2026-05-03 21:18:40 18cfa9a9
+│  Hello world commit
+◆  suxwzwsx george.sh.tech+github@gmail.com 2026-05-03 21:17:04 9b7c31e5
+│  init commit - made using git command
+◆  zzzzzzzz root() 00000000
+```
+
+Ещё раз обращаем внимание на наличие пустышки после точки слияния двух ветвей. Что же касается самой это точки, то в результате выполнения команды new с двумя родителями, получается empty коммит, который нам предложат интерактивно подписать текстом. 
+
+```shell
+# пушим в темпе
+jj git push -b master
+```
+
+Ещё немного о синхронизации изменений с ремоутом.
+
+```shell
+# допустим, что мы Н-ым количеством пушей заливали изменения некоторой ветки
+jj git push -b feature/test
+
+# после слияния мы можем захотеть почистить ремоут с локальным репозиторием от этой метки-ветки
+jj b delete feature/test     # удалили локальную метку
+jj git push -b feature/test  # удалили ремоут ветку, которая отслеживала локальную метку.
+```
+
+Собственно, на этом и всё. Резковато вышло... Далее я наполнил текстом второй блок. Также используя подход слияния.
 
 ---
 
