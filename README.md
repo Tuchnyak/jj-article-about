@@ -18,13 +18,15 @@
 
 ### Коротко о jujutsu
 
-Jujutsu - это относительно новая и **самостоятельная** (но есть нюансы) система контроля версий (CVS), рождённая в недрах Google.
+Jujutsu - это относительно новая и **самостоятельная** (но есть нюансы) система контроля версий (VCS), рождённая в недрах Google.
 
 - Гитхаб репозиторий: [GitHub - jj-vcs/jj: A Git-compatible VCS that is both simple and powerful · GitHub](https://github.com/jj-vcs/jj)
 
 - Есть текстовый туториал [Introduction - Jujutsu for everyone](https://jj-for-everyone.github.io/introduction.html), который сам я поленился проходить =)
 
 Нюанс самостоятельности раскроется далее.
+
+Установку jujutsu оставляю на откуп читателя :D
 
 ## BLOCK-1: Философия jj
 
@@ -121,6 +123,107 @@ jj git push --bookmark feature/article-1
 
 ## BLOCK-2: Закатываем рукава
 
+Как я упоминал выше, написание этого текста я фиксирую с JJ. Не очень просто, я вам скажу, текст писать так, чтобы ещё и рабочие кейсы иллюстрировать. Надеюсь, кукушка справится.
+
+### Начало
+
+1. Прежде всего я создал пустую директорию и инициализировал в ней git-репозиторий.
+
+2. Добавил .gitignore файл.
+   
+    - ```
+       .git/
+       .jj/
+      ```
+
+3. Сделал классический init коммит.
+
+4. Добавил пустой README.md и закоммитил с hello world текстом.
+   
+    - ```shell
+      * 18cfa9a tuchnyak 23 seconds ago
+      |   Hello world commit
+      | 
+      * 9b7c31e tuchnyak 2 minutes ago
+          init commit - made using git command
+      ```
+
+### Облачаемся в кимоно
+
+Настало время инициализировать джиу-джитсу репозиторий. Кстати, правильнее было бы написать не кимоно, а ги...
+
+```shell
+# выполняем команду
+jj
+# И видим, что репозиторий ещё не инициализирован, но уже присутствует Git'овый
+Hint: Use `jj -h` for a list of available commands.
+Run `jj config set --user ui.default-command log` to disable this message.
+Error: There is no jj repo in "."
+Hint: It looks like this is a git repo. You can create a jj repo backed by it by running this:
+jj git init
+
+# Не думаем (часто полезный навык) и выполняем рекомендуемую команду!
+jj git init
+
+# получаем статус и новую рекомендацию по отслеживанию МЕТКИ 
+# по одноимённой ветке в ремоуте
+Done importing changes from the underlying Git repo.
+Hint: The following remote bookmarks aren't associated with the existing local bookmarks:
+  master@origin
+Hint: Run the following command to keep local bookmarks updated on future pulls:
+  jj bookmark track master --remote=origin
+Initialized repo in "."
+
+# мозг отдыхает, а пальцы пишут команду
+jj b track master --remote=origin
+
+Started tracking 1 remote bookmarks.
+
+# теперь снова выполняем команду jj, которая вернёт нам лог
+# с несколькими последними коммитами
+jj
+# нам покажут несколько 
+Hint: Use `jj -h` for a list of available commands.
+Run `jj config set --user ui.default-command log` to disable this message.
+@  ytxlyqkz george.sh.tech+github@gmail.com 2026-05-03 21:34:15 bc1a822b
+│  (empty) (no description set)
+◆  stwtwrzm george.sh.tech+github@gmail.com 2026-05-03 21:18:40 master 18cfa9a9
+│  Hello world commit
+~
+```
+
+Тут, как раз, мы можем сравнить на иллюстрациях две философии: Git vs. Jujutsu. Лог гита выводит два зафиксированных коммита, но не показывает наше текущее рабочее пространство. А вот jj показал те же коммиты, плюс наш текущий пустой и не подписанный коммит-изменение, в который будут складываться все наши новые правки.
+
+#### Бабушкина квартира или наследники
+
+Немного передохнём и коротко посмотрим как выводить лог с историей изменений. Стоит отметить, что тут он сразу, из коробки, выводится в приятном виде.
+
+В самом коротком виде команда выглядит так: `jj log`. Но движок выведет нам лишь несколько последних коммитов. Мне такого мало, я люблю когда красоты много! Поэтому использую вот такое заклинание с собакой и баяном:
+
+```shell
+jj log -r ::@
+```
+
+- -r - это параметр, который принимает ревизию.
+
+**Ревизия** - это наши изменения aka коммиты. То есть в данном синтаксисе мы можем передвть change-id изменения, имя метки, которая указывает на какой-либо коммит, или "@" собаку.
+
+- "@" - символ собаки всегда указывает нам на текущее изменение-комит.
+
+- "::" - а вот двойное двоеточие показывает направление, в котором следует отобразить граф истории. "Время" тут "идёт" слева направо. Следовательно, баянчик слева от собачки требует показать родителей. А если поставим справа от идентификатора ревизии, то от ревизии к потомкам. Два баяна, слева и справа, разрывает временной континуум джиу-джитсу, и мы получим ошибку.
+
+Также мы можем использовать "@" и в других командах, совмещая с минусами и плюсами, чтобы относительно ссылаться на родителей и потомков. Например:
+
+- @-- - коммит дед/бабушка
+
+- @++ - внучатый коммит.
+
+#### Пояс потуже
+
+Что было дальше? Дальше я наполнил первый блок статьи в несколько коммитов.
+
+
+
 ---
 
 ```shell
@@ -203,5 +306,4 @@ Moved 1 bookmarks to yvpmquor ff76e88d master* | (empty) merge feature/article-1
 ◆  suxwzwsx george.sh.tech+github@gmail.com 2026-05-03 21:17:04 9b7c31e5
 │  init commit - made using git command
 ◆  zzzzzzzz root() 00000000
-
 ```
